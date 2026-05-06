@@ -5,9 +5,9 @@ import { cn } from '@/src/lib/utils';
 import { Link, useParams } from 'react-router-dom';
 
 const mockExercise = {
-  name: 'Bench Press',
+  name: '杠铃卧推',
   category: 'CHEST & TRICEPS',
-  lastWeight: '100KG',
+  lastSession: [],
   image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBi3JjkGlWIk9DB1BkEWz0nTI4i_0kxNs1loKKUCaJgWF0K-3mXDVWftS03r5WXBC9EC7ILeGfOW1qVUGrvSGaurjo-aqRaN99gLVbzGdbwNlSRwDivlHjI76Ci4aaAqMpLn8QEmGj-IixOwWE13EzLGSVR41Mvz_ePOFSx5Czrc3FVq1dcSgRv2xpoMdKEMBFksrchGEbb90d7OpzERHNiToVbIrxCDiYQxulGSDy8exynsY_Z2bVvHEamqNTfm3yUNhHu4ajXJnQ'
 };
 
@@ -26,6 +26,10 @@ export default function WorkoutLogger() {
     setSets(sets.filter(s => s.id !== id));
   };
 
+  const updateSet = (id: number, field: 'weight' | 'reps', value: string) => {
+    setSets(sets.map(s => s.id === id ? { ...s, [field]: value } : s));
+  };
+
   return (
     <div className="space-y-8 pb-10">
       {/* Exercise Hero */}
@@ -36,11 +40,23 @@ export default function WorkoutLogger() {
           </span>
           <h1 className="text-4xl font-black text-white tracking-widest uppercase italic">{mockExercise.name}</h1>
         </div>
-        <div className="absolute top-6 right-6 glass-panel px-4 py-2 rounded-xl border-primary/20">
-          <div className="flex items-center gap-2">
+        <div className="absolute top-6 right-6 glass-panel px-4 py-3 rounded-xl border-primary/20 min-w-[140px]">
+          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/10">
             <History className="w-4 h-4 text-primary" />
-            <span className="font-lexend text-[9px] text-on-surface-variant tracking-widest uppercase leading-none">Last: {mockExercise.lastWeight}</span>
+            <span className="font-lexend text-[9px] text-white tracking-widest uppercase leading-none">Last Session</span>
           </div>
+          {mockExercise.lastSession && mockExercise.lastSession.length > 0 ? (
+            <div className="space-y-1.5">
+              {mockExercise.lastSession.map((set, idx) => (
+                <div key={idx} className="flex justify-between items-center font-lexend text-[10px]">
+                  <span className="text-on-surface-variant font-medium">S{idx + 1}</span>
+                  <span className="text-primary-dim tracking-wider">{set.weight}<span className="text-[8px] text-on-surface-variant ml-0.5">KG</span> × {set.reps}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-[10px] font-lexend text-on-surface-variant text-center py-1">No Data</div>
+          )}
         </div>
       </section>
 
@@ -67,15 +83,30 @@ export default function WorkoutLogger() {
                 <input 
                   type="number" 
                   placeholder="0" 
+                  value={set.weight}
+                  onChange={(e) => updateSet(set.id, 'weight', e.target.value)}
                   className="w-full bg-transparent input-underline font-lexend text-2xl text-white text-center py-1"
                 />
               </div>
-              <div className="col-span-4">
+              <div className="col-span-4 flex flex-col items-center">
                 <input 
                   type="number" 
                   placeholder="0" 
-                  className="w-full bg-transparent input-underline font-lexend text-2xl text-white text-center py-1"
+                  value={set.reps}
+                  onChange={(e) => updateSet(set.id, 'reps', e.target.value)}
+                  className="w-full bg-transparent input-underline font-lexend text-2xl text-white text-center py-1 mb-1.5"
                 />
+                <div className="flex justify-center gap-1.5 w-full">
+                  {[8, 10, 12].map(r => (
+                    <button 
+                      key={r}
+                      onClick={() => updateSet(set.id, 'reps', r.toString())}
+                      className="flex-1 py-1 bg-surface-container-highest rounded text-[9px] font-lexend text-on-surface-variant hover:text-primary transition-colors active:scale-95"
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="col-span-2 flex justify-end">
                 <button 
@@ -116,7 +147,7 @@ export default function WorkoutLogger() {
       <section className="pt-8">
         <h3 className="font-lexend text-[10px] text-on-surface-variant uppercase tracking-[0.2em] mb-4">Progression Track</h3>
         <div className="glass-panel p-6 rounded-2xl h-36 flex items-end gap-2">
-          {[0.5, 0.7, 0.45, 0.8, 1].map((h, i) => (
+          {[0, 0, 0, 0, 0].map((h, i) => (
             <motion.div 
               key={i}
               initial={{ height: 0 }}

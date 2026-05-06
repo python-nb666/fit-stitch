@@ -9,7 +9,7 @@ const splits = [
     name: 'Chest Day',
     type: 'STRENGTH',
     duration: '65 MIN',
-    exercises: ['Incline Press', 'Cable Flyes', 'Weighted Dips'],
+    exercises: ['上斜推胸', '绳索飞鸟', '负重双杠臂屈伸'],
     img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAJKifnBTrYnwsgF5T11IKnfqG_9RIg4IXUacTFELEa-gCXk2LTl2YrWjkuJ7B-TZt4PDQ5NYEvUqdEss0pBr2PznTDPa0FVegYOr3IVW66YhYbGVqS2cZrZhvq6Ctto49_qTw74JeEHO2W8PwyKj_ZHp1dFoHNpGQ9qFTIw3zrYZDxtfwQaNocLEtzfxuLvQnIVuwMmXnKk1UZaN92CBUqFiB8uhk14iLjdQiYwYfkpxixDhE_cmZ1jpLx_qRIHxSWzl52BivdsPo'
   },
   {
@@ -17,7 +17,7 @@ const splits = [
     name: 'Back Day',
     type: 'HYPERTROPHY',
     duration: '75 MIN',
-    exercises: ['Deadlift', 'Lat Pulldowns', 'DB Rows'],
+    exercises: ['硬拉', '高位下拉', '哑铃划船'],
     img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNK5_2Pmcw7ITaHj_KQ7aESGwrj4UqMamCk_IqWKiMdaa7ajCZauCsgE5ZrcyX2PDP0LSh-gM4a2MBamsDPFduZui0KLmVENrphsLeV4MOyt4Pd-xzSAot7KR9cDf675DryWbnWi0lIA4RPQzKM2SYv1vR97LsBVx7gOQR37Xaz2mf7gBarg6tYsvGZQSrpf-iw8ognZgFHhN9E3l-GdsZIlguwCWKbc7-P-0ZBr5k-KVVYamKuWbBbujAIkuhnasRWbZsyhwgqIA'
   },
   {
@@ -25,7 +25,7 @@ const splits = [
     name: 'Leg Day',
     type: 'INTENSITY',
     duration: '90 MIN',
-    exercises: ['Barbell Squats', 'Leg Press', 'Hamstring Curls', 'Calf Raises'],
+    exercises: ['杠铃深蹲', '腿举', '腿弯举', '提踵'],
     img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT_ZHsi7uMy-l9M6Aut4PMsQU5qddgjV7Q1Bya8gfLD0SWljjxup9HeFvu7w7r1a_xlYnmPKncCPaGE_KD_MzUlmtTEdG2HW953JkPpyGgu2nVxrtLHpUztWkhTt5fcGpXCg4741i0KIramNqKAV0GFg8bOThPsFLxzbAS-ePNpLe3Mk-1oXOmDDXk72MzmjFP-Xt8W73eVOhZahj_T_6wWxU2Mj-oD8ofKIUrfH49E92W3BEM9kDXH1RYJY_HEqaSSY6GuGQv9b4',
     fullWidth: true
   }

@@ -5,20 +5,20 @@ import { cn } from '@/src/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
 const weeklyData = [
-  { day: 'MON', value: 40 },
-  { day: 'TUE', value: 65 },
-  { day: 'WED', value: 30 },
-  { day: 'THU', value: 90, active: true },
-  { day: 'FRI', value: 55 },
-  { day: 'SAT', value: 70 },
-  { day: 'SUN', value: 20 },
+  { day: 'MON', value: 0 },
+  { day: 'TUE', value: 0 },
+  { day: 'WED', value: 0 },
+  { day: 'THU', value: 0, active: true },
+  { day: 'FRI', value: 0 },
+  { day: 'SAT', value: 0 },
+  { day: 'SUN', value: 0 },
 ];
 
 const metrics = [
-  { icon: Timer, label: 'AVG DURATION', value: '42m' },
-  { icon: Flame, label: 'KCAL BURNED', value: '1,840' },
-  { icon: Dumbbell, label: 'TOTAL VOLUME', value: '14.2t' },
-  { icon: Activity, label: 'RESTING HR', value: '58' },
+  { icon: Timer, label: 'AVG DURATION', value: '0m' },
+  { icon: Flame, label: 'KCAL BURNED', value: '0' },
+  { icon: Dumbbell, label: 'TOTAL VOLUME', value: '0t' },
+  { icon: Activity, label: 'RESTING HR', value: '--' },
 ];
 
 export default function Dashboard() {
@@ -51,7 +51,7 @@ export default function Dashboard() {
           <div>
             <h3 className="font-lexend text-[9px] text-on-surface-variant uppercase tracking-[0.2em]">Today's Completion</h3>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-lexend text-4xl font-medium text-primary">85</span>
+              <span className="font-lexend text-4xl font-medium text-primary">0</span>
               <span className="font-sans text-lg text-on-surface-variant">%</span>
             </div>
           </div>
@@ -60,7 +60,7 @@ export default function Dashboard() {
             <div className="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
               <motion.div 
                 initial={{ width: 0 }}
-                animate={{ width: '85%' }}
+                animate={{ width: '0%' }}
                 transition={{ duration: 1, ease: 'easeOut' }}
                 className="h-full bg-primary shadow-[0_0_12px_#c6f333]" 
               />
@@ -133,10 +133,7 @@ export default function Dashboard() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            { tag: 'POWER', name: 'Hypertrophy B', date: '12.04.24', meta: '64 MIN • 8 EXERCISES', color: 'text-secondary', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC_aHD2cmnIRRptIZ32Oa6qdkCvY877YXRrBDILrJbSUmpkj3enJDSVi_m02hcQ85eOJFZkmG9PCwC9Jga3h8Wud5wqsq1UGI1N0UFAre4AKpAy4l7gzZLmYnOlKW8VCMMps-Z77iDj16D93Xq1hbql4Ui9q9H4dbKTqctKfHkqF3TX5dpgAkcqVwFK_EG2nHZGleHaJT3O7QxP1kYZM9u6GVMlURWD3AsLKXh59zwh8Czk11MicQA7af2Ib_ZoZWv2A3kAw7awX2Y' },
-            { tag: 'RECOVERY', name: 'Mobility Flow', date: '11.04.24', meta: '22 MIN • 4 EXERCISES', color: 'text-primary-dim', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBevwLYzkhVeclY9fzsaofq8wjqvMzPGOwPDFBNfem6oVLc3UTCLj-zxNSR99OJgzDqYa6RDL5Vtt_cy8sdKGS79-E1S_mASpJ2b59hM5lxnnjpW2vf7bx30stYQv9FWEW5By0FkyuJY-ye3jKQhSoy79EO197cX8ZKe2E4jkHm-sxEV-n90uSVcIWJhLeVyfZvT701B-0jTsCCCyMbcosWFvRE6QZ4bOCihp67bNtwM5XHnq0Ro9uTyz6I8dTRJCVrBc6qeyRdmS4' }
-          ].map((workout, i) => (
+          {[].map((workout: any, i) => (
             <div key={i} className="relative h-28 rounded-2xl overflow-hidden border border-white/10 flex items-center px-5 group cursor-pointer transform hover:translate-x-1 transition-all duration-300">
               <img 
                 src={workout.img} 

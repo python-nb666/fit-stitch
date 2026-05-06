@@ -3,23 +3,50 @@ import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Trophy, Gauge, His
 import { cn } from '@/src/lib/utils';
 
 const stats = [
-  { label: 'MONTHLY SESSIONS', value: '18' },
-  { label: 'TOTAL VOLUME', value: '142k' },
+  { label: 'MONTHLY SESSIONS', value: '0' },
+  { label: 'TOTAL VOLUME', value: '0' },
 ];
 
 const calendarDays = Array.from({ length: 30 }, (_, i) => ({
   day: i + 1,
-  active: [1, 4, 5, 7, 8, 11].includes(i + 1),
+  active: false,
   current: i + 1 === 11
 }));
 
+import { Copy } from 'lucide-react';
+
 export default function HistoryView() {
+  const handleExport = () => {
+    const exportData = {
+      stats,
+      calendarDays,
+      weightTrends: {
+        current: 0,
+        change: 0,
+        data: [0, 0, 0, 0, 0, 0]
+      },
+      benchmarks: []
+    };
+    navigator.clipboard.writeText(JSON.stringify(exportData, null, 2))
+      .then(() => alert('所有的训练数据已成功复制到剪贴板！'))
+      .catch(() => alert('复制失败，请重试'));
+  };
+
   return (
     <div className="space-y-8 pb-10">
       <section className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <p className="font-lexend text-[10px] text-on-surface-variant tracking-[0.3em] uppercase mb-1">Athlete Progression</p>
-          <h1 className="text-4xl font-black text-white tracking-widest uppercase italic">History & Stats</h1>
+          <div className="flex flex-wrap items-center gap-4 mt-1">
+            <h1 className="text-4xl font-black text-white tracking-widest uppercase italic">History & Stats</h1>
+            <button 
+              onClick={handleExport}
+              className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-3 py-1.5 rounded-lg text-xs font-lexend uppercase tracking-widest transition-colors flex items-center gap-1.5 active:scale-95"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              Copy Data
+            </button>
+          </div>
         </div>
         <div className="flex gap-4">
           {stats.map((stat, i) => (
@@ -77,16 +104,16 @@ export default function HistoryView() {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic">Weight Trends</h3>
-              <p className="text-on-surface-variant text-xs mt-1">-2.4kg this month</p>
+              <p className="text-on-surface-variant text-xs mt-1">0.0kg this month</p>
             </div>
             <div className="text-right">
-              <span className="font-lexend text-3xl font-medium text-primary">84.2</span>
+              <span className="font-lexend text-3xl font-medium text-primary">0.0</span>
               <span className="font-lexend text-[10px] text-on-surface-variant ml-1 uppercase">KG</span>
             </div>
           </div>
           
           <div className="flex-grow flex items-end gap-2 h-40 mt-auto">
-            {[0.8, 0.75, 0.78, 0.7, 0.65, 0.6].map((h, i) => (
+            {[0, 0, 0, 0, 0, 0].map((h, i) => (
               <div key={i} className="flex-1 bg-primary/20 h-full rounded-t-sm relative group">
                 <div 
                   style={{ height: `${h * 100}%` }}
@@ -116,10 +143,7 @@ export default function HistoryView() {
           </div>
           
           <div className="divide-y divide-white/5">
-            {[
-              { label: 'Deadlift 1RM', icon: Trophy, value: '185.0', unit: 'KG', sub: '+5.0 KG (PR)', color: 'text-primary', update: 'Last update: 3 days ago' },
-              { label: '5km Time', icon: History, value: '22:45', unit: 'MIN', sub: '+0:12 MIN', color: 'text-secondary', update: 'Last update: 1 week ago' }
-            ].map((benchmark, i) => (
+            {[].map((benchmark: any, i) => (
               <div key={i} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group cursor-pointer">
                 <div className="flex items-center gap-6">
                   <div className="w-14 h-14 rounded-2xl bg-surface-container-highest flex items-center justify-center text-primary transition-transform group-hover:scale-110">
