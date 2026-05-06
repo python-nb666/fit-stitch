@@ -1,15 +1,16 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Clock, Plus, ChevronRight } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-const splits = [
+const defaultSplits = [
   {
     id: 'chest',
     name: 'Chest Day',
     type: 'STRENGTH',
     duration: '65 MIN',
-    exercises: ['上斜推胸', '绳索飞鸟', '负重双杠臂屈伸'],
+    exercises: ['平板卧推', '哑铃卧推', '上斜哑铃卧推', '蝴蝶机夹胸', '固定器械坐姿推胸', '绳索下压'],
     img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAJKifnBTrYnwsgF5T11IKnfqG_9RIg4IXUacTFELEa-gCXk2LTl2YrWjkuJ7B-TZt4PDQ5NYEvUqdEss0pBr2PznTDPa0FVegYOr3IVW66YhYbGVqS2cZrZhvq6Ctto49_qTw74JeEHO2W8PwyKj_ZHp1dFoHNpGQ9qFTIw3zrYZDxtfwQaNocLEtzfxuLvQnIVuwMmXnKk1UZaN92CBUqFiB8uhk14iLjdQiYwYfkpxixDhE_cmZ1jpLx_qRIHxSWzl52BivdsPo'
   },
   {
@@ -32,6 +33,21 @@ const splits = [
 ];
 
 export default function SplitSelection() {
+  const navigate = useNavigate();
+  const [splits, setSplits] = useState(defaultSplits);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('customSplits');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setSplits([...defaultSplits, ...parsed]);
+      } catch (e) {
+        console.error('Failed to parse custom splits', e);
+      }
+    }
+  }, []);
+
   return (
     <div className="space-y-8 pb-10">
       <section>
@@ -75,7 +91,10 @@ export default function SplitSelection() {
         ))}
       </div>
 
-      <div className="mt-8 border border-dashed border-white/10 rounded-2xl p-6 flex items-center justify-between group hover:border-primary/30 transition-colors cursor-pointer bg-surface/30">
+      <div 
+        onClick={() => navigate('/workouts/custom')}
+        className="mt-8 border border-dashed border-white/10 rounded-2xl p-6 flex items-center justify-between group hover:border-primary/30 transition-colors cursor-pointer bg-surface/30"
+      >
         <div className="flex items-center gap-6">
           <div className="w-12 h-12 rounded-full glass-panel flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
             <Plus className="w-6 h-6" />

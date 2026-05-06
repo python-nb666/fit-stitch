@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import Dashboard from './views/Dashboard';
 import SplitSelection from './views/SplitSelection';
+import CustomSplitBuilder from './views/CustomSplitBuilder';
 import ExerciseSelection from './views/ExerciseSelection';
 import WorkoutLogger from './views/WorkoutLogger';
 import HistoryView from './views/History';
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="workouts" element={<SplitSelection />} />
+          <Route path="workouts/custom" element={<CustomSplitBuilder />} />
           <Route path="workouts/:splitId" element={<ExerciseSelection />} />
           <Route path="workouts/:splitId/log" element={<WorkoutLogger />} />
           <Route path="history" element={<HistoryView />} />
