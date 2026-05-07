@@ -21,6 +21,7 @@ export default function App() {
           <Route path="workouts" element={<SplitSelection />} />
           <Route path="workouts/custom" element={<CustomSplitBuilder />} />
           <Route path="workouts/:splitId" element={<ExerciseSelection />} />
+          <Route path="workouts/:splitId/log/:exerciseName" element={<WorkoutLogger />} />
           <Route path="workouts/:splitId/log" element={<WorkoutLogger />} />
           <Route path="history" element={<HistoryView />} />
           <Route path="stats" element={<HistoryView />} /> {/* Simple alias for demo */}

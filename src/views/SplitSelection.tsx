@@ -34,18 +34,12 @@ const defaultSplits = [
 
 export default function SplitSelection() {
   const navigate = useNavigate();
-  const [splits, setSplits] = useState(defaultSplits);
+  const [splits, setSplits] = useState<any[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('customSplits');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setSplits([...defaultSplits, ...parsed]);
-      } catch (e) {
-        console.error('Failed to parse custom splits', e);
-      }
-    }
+    import('@/src/lib/defaultData').then(({ getSplits }) => {
+      setSplits(getSplits());
+    });
   }, []);
 
   return (

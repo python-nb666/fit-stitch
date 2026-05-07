@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { Play } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 const exercises = [
   { id: 'bench-press', name: '平板卧推', tag: 'STRENGTH', lastWeight: '-', unit: 'KG', img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop' },
@@ -13,6 +13,8 @@ const exercises = [
 ];
 
 export default function ExerciseSelection() {
+  const { splitId } = useParams();
+
   return (
     <div className="space-y-6 pb-10">
       {/* Header Stat */}
@@ -38,7 +40,8 @@ export default function ExerciseSelection() {
           {exercises.map((ex) => (
             <Link 
               key={ex.id} 
-              to="/workouts/1/log"
+              to={`/workouts/${splitId || '1'}/log/${encodeURIComponent(ex.name)}`}
+              state={{ exercise: ex }}
               className={cn(
                 "relative group text-left flex flex-col w-full rounded-2xl overflow-hidden glass-card transition-all active:scale-95 duration-200 bg-surface-container-low hover:bg-surface-container-high",
                 ex.full && "md:col-span-2"

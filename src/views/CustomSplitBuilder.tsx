@@ -1,30 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Target, Dumbbell } from 'lucide-react';
+import { getSplits, saveSplits } from '@/src/lib/defaultData';
 
 export default function CustomSplitBuilder() {
   const navigate = useNavigate();
-  const [part, setPart] = useState('');
+  const [splits, setSplits] = useState<any[]>([]);
+  const [selectedSplitId, setSelectedSplitId] = useState('');
   const [exercise, setExercise] = useState('');
 
+  useEffect(() => {
+    const loadedSplits = getSplits();
+    setSplits(loadedSplits);
+    if (loadedSplits.length > 0) {
+      setSelectedSplitId(loadedSplits[0].id);
+    }
+  }, []);
+
   const handleSave = () => {
-    if (!part.trim()) return alert('请输入训练部位！');
+    if (!selectedSplitId) return alert('请选择训练部位！');
     if (!exercise.trim()) return alert('请输入动作名称！');
 
-    const newSplit = {
-      id: `custom-${Date.now()}`,
-      name: part.trim(),
-      type: 'CUSTOM',
-      duration: '60 MIN',
-      exercises: exercise.split(/[,，、\n]+/).map(e => e.trim()).filter(Boolean),
-      img: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1470&auto=format&fit=crop',
-      fullWidth: false
-    };
+    const newExercises = exercise.split(/[,，、\n]+/).map(e => e.trim()).filter(Boolean);
+    const updatedSplits = splits.map(s => {
+      if (s.id === selectedSplitId) {
+        return { ...s, exercises: [...s.exercises, ...newExercises] };
+      }
+      return s;
+    });
 
-    const saved = localStorage.getItem('customSplits');
-    const parsed = saved ? JSON.parse(saved) : [];
-    localStorage.setItem('customSplits', JSON.stringify([...parsed, newSplit]));
-    
+    saveSplits(updatedSplits);
     navigate('/workouts');
   };
 
@@ -39,21 +44,31 @@ export default function CustomSplitBuilder() {
         </button>
         <div>
           <h1 className="text-3xl font-black text-white tracking-widest uppercase italic leading-none">Add Exercise</h1>
-          <p className="text-on-surface-variant text-xs mt-1">Quickly add a new routine</p>
+          <p className="text-on-surface-variant text-xs mt-1">Append to an existing routine</p>
         </div>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-2">
           <label className="font-lexend text-[10px] text-primary uppercase tracking-[0.2em] ml-2 flex items-center gap-1">
-            <Target className="w-3 h-3" /> 训练部位 (Target Muscle)
+            <Target className="w-3 h-3" /> 训练部位 (Select Muscle Group)
           </label>
-          <input 
-            value={part}
-            onChange={(e) => setPart(e.target.value)}
-            placeholder="例如：肩膀、核心..."
-            className="w-full glass-panel border-none rounded-xl p-4 text-white font-lexend text-xl placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-          />
+          <div className="relative">
+            <select
+              value={selectedSplitId}
+              onChange={(e) => setSelectedSplitId(e.target.value)}
+              className="w-full glass-panel border-none rounded-xl p-4 text-white font-lexend text-xl appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer bg-transparent"
+            >
+              {splits.map(s => (
+                <option key={s.id} value={s.id} className="bg-surface-container-high text-sm">
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-on-surface-variant">
+              ▼
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -76,7 +91,7 @@ export default function CustomSplitBuilder() {
           className="w-full bg-primary text-black font-black text-xl py-5 rounded-2xl shadow-[0_0_30px_rgba(198,243,51,0.2)] active:scale-95 transition-all uppercase italic tracking-tighter flex items-center justify-center gap-2"
         >
           <Save className="w-6 h-6" />
-          保存 (Save)
+          保存动作 (Save Exercises)
         </button>
       </div>
     </div>

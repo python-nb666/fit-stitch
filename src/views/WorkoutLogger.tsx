@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, History, Check, X, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/src/lib/utils';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 
 const mockExercise = {
   name: '杠铃卧推',
@@ -12,7 +12,12 @@ const mockExercise = {
 };
 
 export default function WorkoutLogger() {
-  const { splitId } = useParams();
+  const { splitId, exerciseName } = useParams();
+  const location = useLocation();
+  const activeExercise = location.state?.exercise || mockExercise;
+  
+  const displayTitle = exerciseName ? decodeURIComponent(exerciseName) : activeExercise.name;
+  
   const [sets, setSets] = useState([
     { id: 1, weight: '', reps: '' },
     { id: 2, weight: '', reps: '' },
@@ -36,18 +41,18 @@ export default function WorkoutLogger() {
       <section className="relative h-48 w-full rounded-2xl overflow-hidden border border-white/10 bg-surface-container-low flex flex-col justify-end p-6">
         <div className="relative z-10 space-y-2">
            <span className="font-lexend text-[8px] bg-primary/20 backdrop-blur-md text-primary px-3 py-1 rounded-full border border-primary/20 tracking-widest uppercase inline-block">
-            {mockExercise.category}
+            {activeExercise.tag || activeExercise.category}
           </span>
-          <h1 className="text-4xl font-black text-white tracking-widest uppercase italic">{mockExercise.name}</h1>
+          <h1 className="text-4xl font-black text-white tracking-widest uppercase italic">{displayTitle}</h1>
         </div>
         <div className="absolute top-6 right-6 glass-panel px-4 py-3 rounded-xl border-primary/20 min-w-[140px]">
           <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/10">
             <History className="w-4 h-4 text-primary" />
             <span className="font-lexend text-[9px] text-white tracking-widest uppercase leading-none">Last Session</span>
           </div>
-          {mockExercise.lastSession && mockExercise.lastSession.length > 0 ? (
+          {activeExercise.lastSession && activeExercise.lastSession.length > 0 ? (
             <div className="space-y-1.5">
-              {mockExercise.lastSession.map((set, idx) => (
+              {activeExercise.lastSession.map((set: any, idx: number) => (
                 <div key={idx} className="flex justify-between items-center font-lexend text-[10px]">
                   <span className="text-on-surface-variant font-medium">S{idx + 1}</span>
                   <span className="text-primary-dim tracking-wider">{set.weight}<span className="text-[8px] text-on-surface-variant ml-0.5">KG</span> × {set.reps}</span>

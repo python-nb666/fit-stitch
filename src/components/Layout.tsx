@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { TopAppBar } from './TopAppBar';
 import { BottomNavBar } from './BottomNavBar';
@@ -6,6 +7,10 @@ import { useLocation } from 'react-router-dom';
 
 export function Layout() {
   const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-32">
