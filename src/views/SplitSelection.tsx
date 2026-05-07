@@ -56,6 +56,7 @@ export default function SplitSelection() {
           <Link 
             key={split.id} 
             to={`/workouts/${split.id}`}
+            onClick={() => localStorage.removeItem('completedExs')}
             className={cn(
                "group relative overflow-hidden rounded-2xl flex flex-col justify-end p-5 transition-all duration-300 border border-white/5 active:scale-95 bg-surface-container-low hover:bg-surface-container-high",
                split.fullWidth && "md:col-span-2"

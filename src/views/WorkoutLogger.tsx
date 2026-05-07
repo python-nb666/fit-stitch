@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, History, Check, X, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/src/lib/utils';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, useParams, useLocation, useNavigate } from 'react-router-dom';
 
 const mockExercise = {
   name: '杠铃卧推',
@@ -14,6 +14,7 @@ const mockExercise = {
 export default function WorkoutLogger() {
   const { splitId, exerciseName } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const activeExercise = location.state?.exercise || mockExercise;
   
   const displayTitle = exerciseName ? decodeURIComponent(exerciseName) : activeExercise.name;
@@ -33,6 +34,14 @@ export default function WorkoutLogger() {
 
   const updateSet = (id: number, field: 'weight' | 'reps', value: string) => {
     setSets(sets.map(s => s.id === id ? { ...s, [field]: value } : s));
+  };
+
+  const handleFinish = () => {
+    const prev = JSON.parse(localStorage.getItem('completedExs') || '[]');
+    if (!prev.includes(displayTitle)) {
+      localStorage.setItem('completedExs', JSON.stringify([...prev, displayTitle]));
+    }
+    navigate(`/workouts/${splitId}`);
   };
 
   return (
@@ -135,15 +144,18 @@ export default function WorkoutLogger() {
           </button>
           
           <div className="grid grid-cols-1 gap-4">
-            <button className="w-full bg-primary text-on-primary font-black text-xl py-5 rounded-2xl shadow-[0_0_30px_rgba(198,243,51,0.2)] active:scale-95 transition-all uppercase italic tracking-tighter">
+            <button 
+              onClick={handleFinish}
+              className="w-full bg-primary text-on-primary font-black text-xl py-5 rounded-2xl shadow-[0_0_30px_rgba(198,243,51,0.2)] active:scale-95 transition-all uppercase italic tracking-tighter"
+            >
               Finish Exercise
             </button>
-            <Link 
-              to="/workouts/next"
+            <button 
+              onClick={handleFinish}
               className="w-full border-2 border-primary text-primary font-black text-xl py-5 rounded-2xl active:scale-95 transition-all text-center uppercase italic tracking-tighter"
             >
               Next Exercise
-            </Link>
+            </button>
           </div>
         </div>
       </section>
