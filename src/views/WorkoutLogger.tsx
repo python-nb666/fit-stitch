@@ -18,6 +18,7 @@ export default function WorkoutLogger() {
   const activeExercise = location.state?.exercise || mockExercise;
   
   const displayTitle = exerciseName ? decodeURIComponent(exerciseName) : activeExercise.name;
+  const [unit, setUnit] = useState<'KG' | 'LBS'>('KG');
   
   const [sets, setSets] = useState(() => {
     try {
@@ -55,6 +56,15 @@ export default function WorkoutLogger() {
     if (validSets.length > 0) {
       // 1. Save to Cloud Backend
       const todayStr = new Date().toLocaleDateString('en-CA');
+      
+      const backendSets = validSets.map(s => {
+        let w = parseFloat(s.weight);
+        if (unit === 'LBS' && !isNaN(w)) {
+          w = w * 0.45359237; // Convert LBS to KG
+        }
+        return { ...s, weight: w.toFixed(2) };
+      });
+
       try {
         await fetch('/api/logs', {
           method: 'POST',
@@ -62,7 +72,7 @@ export default function WorkoutLogger() {
           body: JSON.stringify({
             splitId,
             exerciseName: displayTitle,
-            sets: validSets,
+            sets: backendSets,
             date: todayStr
           })
         });
@@ -93,9 +103,19 @@ export default function WorkoutLogger() {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <div>
+        <div className="flex-1">
           <h2 className="text-xl font-black text-white tracking-widest uppercase italic leading-none">Log Set</h2>
           <p className="text-on-surface-variant text-[10px] mt-1 uppercase tracking-widest">Record your performance</p>
+        </div>
+        <div 
+          className="relative flex items-center bg-surface-container-highest rounded-full p-0.5 cursor-pointer w-[54px] h-[22px] shrink-0" 
+          onClick={() => setUnit(unit === 'KG' ? 'LBS' : 'KG')}
+        >
+          <div 
+            className={cn("absolute w-[calc(50%-2px)] h-[calc(100%-4px)] bg-primary rounded-full transition-all duration-300", unit === 'KG' ? "left-0.5" : "left-[calc(50%+1.5px)]")} 
+          />
+          <span className={cn("relative z-10 flex-1 text-center font-lexend text-[8px] font-bold transition-colors", unit === 'KG' ? 'text-black' : 'text-on-surface-variant')}>KG</span>
+          <span className={cn("relative z-10 flex-1 text-center font-lexend text-[8px] font-bold transition-colors", unit === 'LBS' ? 'text-black' : 'text-on-surface-variant')}>LB</span>
         </div>
       </div>
 
@@ -131,19 +151,19 @@ export default function WorkoutLogger() {
       <section className="space-y-6">
         <div className="grid grid-cols-12 gap-4 px-4 text-on-surface-variant font-lexend text-[8px] tracking-[0.2em] uppercase">
           <div className="col-span-2">Set</div>
-          <div className="col-span-4 text-center">Weight (kg)</div>
+          <div className="col-span-4 text-center">Weight ({unit})</div>
           <div className="col-span-4 text-center">Reps</div>
           <div className="col-span-2" />
         </div>
 
         <div className="space-y-3">
           {sets.map((set, i) => (
-            <motion.div 
+              <motion.div 
               key={set.id}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: i * 0.1 }}
-              className="grid grid-cols-12 gap-4 items-center glass-panel p-3 rounded-xl group transition-all hover:bg-white/5"
+              className="grid grid-cols-12 gap-4 items-start glass-panel p-3 rounded-xl group transition-all hover:bg-white/5"
             >
               <div className="col-span-2 flex flex-col ml-2">
                 <span className="font-lexend text-2xl font-medium text-primary leading-none">{i + 1}</span>

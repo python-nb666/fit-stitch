@@ -35,11 +35,13 @@ const defaultSplits = [
 export default function SplitSelection() {
   const navigate = useNavigate();
   const [splits, setSplits] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     import('@/src/lib/defaultData').then(async ({ getSplits }) => {
       const data = await getSplits();
       setSplits(data);
+      setLoading(false);
     });
   }, []);
 
@@ -53,38 +55,57 @@ export default function SplitSelection() {
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {splits.map((split) => (
-          <Link 
-            key={split.id} 
-            to={`/workouts/${split.id}`}
-            onClick={() => localStorage.removeItem('completedExs')}
-            className={cn(
-               "group relative overflow-hidden rounded-2xl flex flex-col justify-end p-5 transition-all duration-300 border border-white/5 active:scale-95 bg-surface-container-low hover:bg-surface-container-high",
-               split.fullWidth && "md:col-span-2"
-            )}
-          >
-            <div className="relative z-10 space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="bg-primary/20 backdrop-blur-md text-primary px-3 py-0.5 rounded-full font-lexend text-[7px] border border-primary/20 tracking-widest uppercase">
-                  {split.type}
-                </span>
-                <div className="glass-panel px-3 py-0.5 rounded-full font-lexend text-[7px] text-on-surface-variant flex items-center gap-1 uppercase tracking-widest">
-                  <Clock className="w-2.5 h-2.5" /> {split.duration}
+        {loading ? (
+          <>
+            {[1, 2, 3].map(i => (
+              <div key={i} className={cn("glass-panel p-5 rounded-2xl h-36 animate-pulse flex flex-col justify-end", i === 3 && "md:col-span-2")}>
+                <div className="flex gap-2 mb-3">
+                  <div className="w-16 h-5 bg-white/10 rounded-full"></div>
+                  <div className="w-20 h-5 bg-white/10 rounded-full"></div>
+                </div>
+                <div className="w-1/3 h-8 bg-white/10 rounded mb-3"></div>
+                <div className="flex gap-1.5">
+                  <div className="w-12 h-5 bg-white/10 rounded"></div>
+                  <div className="w-16 h-5 bg-white/10 rounded"></div>
+                  <div className="w-14 h-5 bg-white/10 rounded"></div>
                 </div>
               </div>
-
-              <h2 className="text-2xl font-black text-primary tracking-tighter uppercase italic">{split.name}</h2>
-              
-              <div className="flex flex-wrap gap-1.5">
-                {split.exercises.map((ex, idx) => (
-                  <span key={idx} className="text-[8px] font-lexend text-on-surface-variant/80 border border-white/10 px-1.5 py-0.5 rounded uppercase tracking-widest">
-                    {ex}
+            ))}
+          </>
+        ) : (
+          splits.map((split) => (
+            <Link 
+              key={split.id} 
+              to={`/workouts/${split.id}`}
+              onClick={() => localStorage.removeItem('completedExs')}
+              className={cn(
+                 "group relative overflow-hidden rounded-2xl flex flex-col justify-end p-5 transition-all duration-300 border border-white/5 active:scale-95 bg-surface-container-low hover:bg-surface-container-high",
+                 split.fullWidth && "md:col-span-2"
+              )}
+            >
+              <div className="relative z-10 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="bg-primary/20 backdrop-blur-md text-primary px-3 py-0.5 rounded-full font-lexend text-[7px] border border-primary/20 tracking-widest uppercase">
+                    {split.type}
                   </span>
-                ))}
+                  <div className="glass-panel px-3 py-0.5 rounded-full font-lexend text-[7px] text-on-surface-variant flex items-center gap-1 uppercase tracking-widest">
+                    <Clock className="w-2.5 h-2.5" /> {split.duration}
+                  </div>
+                </div>
+
+                <h2 className="text-2xl font-black text-primary tracking-tighter uppercase italic">{split.name}</h2>
+                
+                <div className="flex flex-wrap gap-1.5">
+                  {split.exercises.map((ex, idx) => (
+                    <span key={idx} className="text-[8px] font-lexend text-on-surface-variant/80 border border-white/10 px-1.5 py-0.5 rounded uppercase tracking-widest">
+                      {ex}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))
+        )}
       </div>
 
       <div 
