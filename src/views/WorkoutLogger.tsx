@@ -50,26 +50,36 @@ export default function WorkoutLogger() {
     }));
   };
 
-  const handleFinish = () => {
-    let prev;
-    try {
-      prev = JSON.parse(localStorage.getItem('completedExs') || '{}');
-      if (Array.isArray(prev)) prev = {};
-    } catch {
-      prev = {};
-    }
+  const handleFinish = async () => {
     const validSets = sets.filter(s => s.weight && s.reps);
     if (validSets.length > 0) {
+      // 1. Save to Cloud Backend
+      const todayStr = new Date().toLocaleDateString('en-CA');
+      try {
+        await fetch('/api/logs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            splitId,
+            exerciseName: displayTitle,
+            sets: validSets,
+            date: todayStr
+          })
+        });
+      } catch (e) {
+        console.error('Failed to sync with cloud', e);
+      }
+
+      // 2. Keep local cache for immediate UI feedback (Completed UI)
+      let prev;
+      try {
+        prev = JSON.parse(localStorage.getItem('completedExs') || '{}');
+        if (Array.isArray(prev)) prev = {};
+      } catch {
+        prev = {};
+      }
       prev[displayTitle] = validSets;
       localStorage.setItem('completedExs', JSON.stringify(prev));
-      
-      // Record today as a trained day for the History calendar
-      const todayStr = new Date().toLocaleDateString('en-CA'); // gets YYYY-MM-DD in local timezone
-      const trainedDays = JSON.parse(localStorage.getItem('trainedDays') || '[]');
-      if (!trainedDays.includes(todayStr)) {
-        trainedDays.push(todayStr);
-        localStorage.setItem('trainedDays', JSON.stringify(trainedDays));
-      }
     }
     navigate(`/workouts/${splitId}`);
   };

@@ -26,31 +26,20 @@ export const defaultSplits = [
   }
 ];
 
-export const getSplits = () => {
-  const saved = localStorage.getItem('mySplits');
-  if (saved) {
-    let parsed = JSON.parse(saved);
-    let modified = false;
-    parsed = parsed.map((s: any) => {
-      if (s.exercises && s.exercises.includes('平板卧推')) {
-        modified = true;
-        s.exercises = s.exercises.map((e: string) => e === '平板卧推' ? '杠铃卧推' : e);
-      }
-      if (s.pool && s.pool.includes('平板卧推')) {
-        modified = true;
-        s.pool = s.pool.map((e: string) => e === '平板卧推' ? '杠铃卧推' : e);
-      }
-      return s;
-    });
-    if (modified) {
-      localStorage.setItem('mySplits', JSON.stringify(parsed));
+export const getSplits = async () => {
+  try {
+    const res = await fetch('/api/splits');
+    if (res.ok) {
+      return await res.json();
     }
-    return parsed;
+  } catch (e) {
+    console.error('Failed to fetch splits', e);
   }
-  localStorage.setItem('mySplits', JSON.stringify(defaultSplits));
   return defaultSplits;
 };
 
-export const saveSplits = (splits: any) => {
+// Note: The new API saves individual splits, so saveSplits might not be used the same way.
+// We will leave this for backwards compatibility, but it should ideally hit /api/splits/[id]
+export const saveSplits = async (splits: any) => {
   localStorage.setItem('mySplits', JSON.stringify(splits));
 };

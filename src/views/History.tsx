@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Trophy, Gauge, History } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
@@ -9,6 +9,22 @@ import { Copy } from 'lucide-react';
 
 export default function HistoryView() {
   const [monthOffset, setMonthOffset] = useState(0);
+  const [trainedDays, setTrainedDays] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch('/api/history');
+        if (res.ok) {
+          const data = await res.json();
+          setTrainedDays(data.trainedDays || []);
+        }
+      } catch (e) {
+        console.error('Failed to fetch history', e);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   const now = new Date();
   const targetDate = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
@@ -21,8 +37,6 @@ export default function HistoryView() {
   const emptyDaysCount = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
   const prevMonthDays = new Date(targetDate.getFullYear(), targetDate.getMonth(), 0).getDate();
 
-  const trainedDays = JSON.parse(localStorage.getItem('trainedDays') || '[]');
-  
   const currentMonthTrainedCount = trainedDays.filter((dateStr: string) => {
     const d = new Date(dateStr);
     return d.getFullYear() === targetDate.getFullYear() && d.getMonth() === targetDate.getMonth();

@@ -11,9 +11,12 @@ export default function ExerciseSelection() {
   const [completedExs, setCompletedExs] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
-    const splits = getSplits();
-    const found = splits.find((s: any) => s.id === splitId) || splits[0];
-    setSplit(found);
+    const loadData = async () => {
+      const splits = await getSplits();
+      const found = splits.find((s: any) => s.id === splitId) || splits[0];
+      setSplit(found);
+    };
+    loadData();
     
     try {
       const prev = JSON.parse(localStorage.getItem('completedExs') || '{}');

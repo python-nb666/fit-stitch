@@ -14,11 +14,14 @@ export default function CustomSplitBuilder() {
   const [newEx, setNewEx] = useState('');
 
   useEffect(() => {
-    const loadedSplits = getSplits();
-    setSplits(loadedSplits);
-    if (loadedSplits.length > 0) {
-      setSelectedSplitId(loadedSplits[0].id);
-    }
+    const loadData = async () => {
+      const loadedSplits = await getSplits();
+      setSplits(loadedSplits);
+      if (loadedSplits.length > 0) {
+        setSelectedSplitId(loadedSplits[0].id);
+      }
+    };
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -63,14 +66,16 @@ export default function CustomSplitBuilder() {
     setNewEx('');
   };
 
-  const handleSave = () => {
-    const updatedSplits = splits.map(s => {
-      if (s.id === selectedSplitId) {
-        return { ...s, exercises: active, pool };
-      }
-      return s;
-    });
-    saveSplits(updatedSplits);
+  const handleSave = async () => {
+    try {
+      await fetch(`/api/splits/${selectedSplitId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active, pool })
+      });
+    } catch (e) {
+      console.error('Failed to save split', e);
+    }
     navigate('/workouts');
   };
 

@@ -37,8 +37,9 @@ export default function SplitSelection() {
   const [splits, setSplits] = useState<any[]>([]);
 
   useEffect(() => {
-    import('@/src/lib/defaultData').then(({ getSplits }) => {
-      setSplits(getSplits());
+    import('@/src/lib/defaultData').then(async ({ getSplits }) => {
+      const data = await getSplits();
+      setSplits(data);
     });
   }, []);
 
