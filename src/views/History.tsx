@@ -1,31 +1,53 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Trophy, Gauge, History } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
-const stats = [
-  { label: 'MONTHLY SESSIONS', value: '0' },
-  { label: 'TOTAL VOLUME', value: '0' },
-];
 
-const calendarDays = Array.from({ length: 30 }, (_, i) => ({
-  day: i + 1,
-  active: false,
-  current: i + 1 === 11
-}));
 
 import { Copy } from 'lucide-react';
 
 export default function HistoryView() {
+  const [monthOffset, setMonthOffset] = useState(0);
+
+  const now = new Date();
+  const targetDate = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
+  
+  const currentMonth = targetDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const currentDay = monthOffset === 0 ? now.getDate() : null;
+  const daysInMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0).getDate();
+  
+  const firstDayOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1).getDay();
+  const emptyDaysCount = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+  const prevMonthDays = new Date(targetDate.getFullYear(), targetDate.getMonth(), 0).getDate();
+
+  const trainedDays = JSON.parse(localStorage.getItem('trainedDays') || '[]');
+  
+  const currentMonthTrainedCount = trainedDays.filter((dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.getFullYear() === targetDate.getFullYear() && d.getMonth() === targetDate.getMonth();
+  }).length;
+
+  const stats = [
+    { label: 'MONTHLY SESSIONS', value: currentMonthTrainedCount.toString() },
+    { label: 'TOTAL VOLUME', value: '0' },
+  ];
+
+  const calendarDays = Array.from({ length: daysInMonth }, (_, i) => {
+    const day = i + 1;
+    const dateStr = new Date(targetDate.getFullYear(), targetDate.getMonth(), day).toLocaleDateString('en-CA');
+    
+    return {
+      day,
+      active: trainedDays.includes(dateStr),
+      current: day === currentDay
+    };
+  });
   const handleExport = () => {
     const exportData = {
       stats,
       calendarDays,
-      weightTrends: {
-        current: 0,
-        change: 0,
-        data: [0, 0, 0, 0, 0, 0]
-      },
-      benchmarks: []
+      trainedDays
     };
     navigator.clipboard.writeText(JSON.stringify(exportData, null, 2))
       .then(() => alert('所有的训练数据已成功复制到剪贴板！'))
@@ -62,10 +84,10 @@ export default function HistoryView() {
         {/* Calendar */}
         <section className="md:col-span-7 glass-panel rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic">September 2023</h3>
+            <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic">{currentMonth}</h3>
             <div className="flex gap-2">
-              <button className="p-2 hover:bg-white/5 rounded-full transition-colors"><ChevronLeft className="w-5 h-5 text-on-surface-variant" /></button>
-              <button className="p-2 hover:bg-white/5 rounded-full transition-colors"><ChevronRight className="w-5 h-5 text-on-surface-variant" /></button>
+              <button onClick={() => setMonthOffset(monthOffset - 1)} className="p-2 hover:bg-white/5 rounded-full transition-colors active:scale-95"><ChevronLeft className="w-5 h-5 text-on-surface-variant hover:text-white transition-colors" /></button>
+              <button onClick={() => setMonthOffset(monthOffset + 1)} className="p-2 hover:bg-white/5 rounded-full transition-colors active:scale-95"><ChevronRight className="w-5 h-5 text-on-surface-variant hover:text-white transition-colors" /></button>
             </div>
           </div>
           
@@ -76,9 +98,9 @@ export default function HistoryView() {
           </div>
           
           <div className="grid grid-cols-7 gap-2">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: emptyDaysCount }).map((_, i) => (
               <div key={`empty-${i}`} className="h-12 flex items-center justify-center font-sans text-on-surface-variant opacity-20">
-                {28 + i}
+                {prevMonthDays - emptyDaysCount + i + 1}
               </div>
             ))}
             {calendarDays.map((d) => (
@@ -99,71 +121,7 @@ export default function HistoryView() {
           </div>
         </section>
 
-        {/* Weight Trends */}
-        <section className="md:col-span-5 glass-panel rounded-2xl p-6 flex flex-col h-full">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic">Weight Trends</h3>
-              <p className="text-on-surface-variant text-xs mt-1">0.0kg this month</p>
-            </div>
-            <div className="text-right">
-              <span className="font-lexend text-3xl font-medium text-primary">0.0</span>
-              <span className="font-lexend text-[10px] text-on-surface-variant ml-1 uppercase">KG</span>
-            </div>
-          </div>
-          
-          <div className="flex-grow flex items-end gap-2 h-40 mt-auto">
-            {[0, 0, 0, 0, 0, 0].map((h, i) => (
-              <div key={i} className="flex-1 bg-primary/20 h-full rounded-t-sm relative group">
-                <div 
-                  style={{ height: `${h * 100}%` }}
-                  className="absolute bottom-0 left-0 right-0 bg-primary/30 rounded-t-sm group-hover:bg-primary/50 transition-all"
-                />
-                <div 
-                  style={{ bottom: `${h * 100}%` }}
-                  className="absolute left-0 right-0 h-[2px] bg-primary shadow-[0_0_10px_rgba(198,243,51,0.5)] z-10"
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-4">
-            <span className="font-lexend text-[8px] text-on-surface-variant uppercase tracking-widest">Aug 15</span>
-            <span className="font-lexend text-[8px] text-primary uppercase tracking-widest font-bold">Today</span>
-          </div>
-        </section>
 
-        {/* Benchmarks */}
-        <section className="md:col-span-12 glass-panel rounded-2xl overflow-hidden">
-          <div className="p-6 border-b border-white/5 flex justify-between items-center bg-surface/30">
-            <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic">Key Metric Benchmarks</h3>
-            <div className="flex gap-2 p-1 bg-black/40 rounded-full border border-white/5">
-              <button className="px-5 py-1.5 bg-white/5 rounded-full font-lexend text-[9px] text-on-surface-variant uppercase tracking-widest font-bold hover:text-white transition-colors">Lifts</button>
-              <button className="px-5 py-1.5 bg-primary text-on-primary rounded-full font-lexend text-[9px] uppercase tracking-widest font-bold">Cardio</button>
-            </div>
-          </div>
-          
-          <div className="divide-y divide-white/5">
-            {[].map((benchmark: any, i) => (
-              <div key={i} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group cursor-pointer">
-                <div className="flex items-center gap-6">
-                  <div className="w-14 h-14 rounded-2xl bg-surface-container-highest flex items-center justify-center text-primary transition-transform group-hover:scale-110">
-                    <benchmark.icon className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-white uppercase italic tracking-tighter">{benchmark.label}</p>
-                    <p className="text-on-surface-variant text-xs mt-0.5">{benchmark.update}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-lexend text-2xl font-medium text-white">
-                    {benchmark.value} <span className="text-[10px] text-on-surface-variant uppercase">{benchmark.unit}</span>
-                  </p>
-                  <p className={cn("text-[9px] font-lexend uppercase tracking-widest mt-1", benchmark.color)}>{benchmark.sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   );

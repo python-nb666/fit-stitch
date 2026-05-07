@@ -11,6 +11,7 @@ import CustomSplitBuilder from './views/CustomSplitBuilder';
 import ExerciseSelection from './views/ExerciseSelection';
 import WorkoutLogger from './views/WorkoutLogger';
 import HistoryView from './views/History';
+import StatsView from './views/Stats';
 
 export default function App() {
   return (
@@ -24,7 +25,7 @@ export default function App() {
           <Route path="workouts/:splitId/log/:exerciseName" element={<WorkoutLogger />} />
           <Route path="workouts/:splitId/log" element={<WorkoutLogger />} />
           <Route path="history" element={<HistoryView />} />
-          <Route path="stats" element={<HistoryView />} /> {/* Simple alias for demo */}
+          <Route path="stats" element={<StatsView />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
