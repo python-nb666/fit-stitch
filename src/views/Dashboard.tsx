@@ -80,7 +80,7 @@ export default function Dashboard() {
           </div>
           
           <div className="h-28 mt-4">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="99%" height={112} minHeight={112} minWidth={10}>
               <BarChart data={weeklyData}>
                 <XAxis 
                   dataKey="day" 

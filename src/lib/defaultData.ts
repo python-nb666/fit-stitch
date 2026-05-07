@@ -4,7 +4,7 @@ export const defaultSplits = [
     name: 'Chest Day',
     type: 'STRENGTH',
     duration: '65 MIN',
-    exercises: ['平板卧推', '哑铃卧推', '上斜哑铃卧推', '蝴蝶机夹胸', '固定器械坐姿推胸', '绳索下压'],
+    exercises: ['杠铃卧推', '哑铃卧推', '上斜哑铃卧推', '蝴蝶机夹胸', '固定器械坐姿推胸', '绳索下压'],
     img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAJKifnBTrYnwsgF5T11IKnfqG_9RIg4IXUacTFELEa-gCXk2LTl2YrWjkuJ7B-TZt4PDQ5NYEvUqdEss0pBr2PznTDPa0FVegYOr3IVW66YhYbGVqS2cZrZhvq6Ctto49_qTw74JeEHO2W8PwyKj_ZHp1dFoHNpGQ9qFTIw3zrYZDxtfwQaNocLEtzfxuLvQnIVuwMmXnKk1UZaN92CBUqFiB8uhk14iLjdQiYwYfkpxixDhE_cmZ1jpLx_qRIHxSWzl52BivdsPo'
   },
   {
@@ -28,7 +28,25 @@ export const defaultSplits = [
 
 export const getSplits = () => {
   const saved = localStorage.getItem('mySplits');
-  if (saved) return JSON.parse(saved);
+  if (saved) {
+    let parsed = JSON.parse(saved);
+    let modified = false;
+    parsed = parsed.map((s: any) => {
+      if (s.exercises && s.exercises.includes('平板卧推')) {
+        modified = true;
+        s.exercises = s.exercises.map((e: string) => e === '平板卧推' ? '杠铃卧推' : e);
+      }
+      if (s.pool && s.pool.includes('平板卧推')) {
+        modified = true;
+        s.pool = s.pool.map((e: string) => e === '平板卧推' ? '杠铃卧推' : e);
+      }
+      return s;
+    });
+    if (modified) {
+      localStorage.setItem('mySplits', JSON.stringify(parsed));
+    }
+    return parsed;
+  }
   localStorage.setItem('mySplits', JSON.stringify(defaultSplits));
   return defaultSplits;
 };
