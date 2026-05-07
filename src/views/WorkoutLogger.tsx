@@ -19,13 +19,21 @@ export default function WorkoutLogger() {
   
   const displayTitle = exerciseName ? decodeURIComponent(exerciseName) : activeExercise.name;
   
-  const [sets, setSets] = useState([
-    { id: 1, weight: '', reps: '' },
-    { id: 2, weight: '', reps: '' },
-  ]);
+  const [sets, setSets] = useState(() => {
+    try {
+      const prev = JSON.parse(localStorage.getItem('completedExs') || '{}');
+      if (!Array.isArray(prev) && prev[displayTitle] && prev[displayTitle].length > 0) {
+        return prev[displayTitle];
+      }
+    } catch {}
+    return [
+      { id: 1, weight: '', reps: '', time: '' },
+      { id: 2, weight: '', reps: '', time: '' },
+    ];
+  });
 
   const addSet = () => {
-    setSets([...sets, { id: sets.length + 1, weight: '', reps: '' }]);
+    setSets([...sets, { id: sets.length + 1, weight: '', reps: '', time: '' }]);
   };
 
   const removeSet = (id: number) => {
@@ -33,19 +41,46 @@ export default function WorkoutLogger() {
   };
 
   const updateSet = (id: number, field: 'weight' | 'reps', value: string) => {
-    setSets(sets.map(s => s.id === id ? { ...s, [field]: value } : s));
+    setSets(sets.map(s => {
+      if (s.id === id) {
+        const time = s.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return { ...s, [field]: value, time };
+      }
+      return s;
+    }));
   };
 
   const handleFinish = () => {
-    const prev = JSON.parse(localStorage.getItem('completedExs') || '[]');
-    if (!prev.includes(displayTitle)) {
-      localStorage.setItem('completedExs', JSON.stringify([...prev, displayTitle]));
+    let prev;
+    try {
+      prev = JSON.parse(localStorage.getItem('completedExs') || '{}');
+      if (Array.isArray(prev)) prev = {};
+    } catch {
+      prev = {};
+    }
+    const validSets = sets.filter(s => s.weight && s.reps);
+    if (validSets.length > 0) {
+      prev[displayTitle] = validSets;
+      localStorage.setItem('completedExs', JSON.stringify(prev));
     }
     navigate(`/workouts/${splitId}`);
   };
 
   return (
-    <div className="space-y-8 pb-10">
+    <div className="space-y-6 pb-10">
+      <div className="flex items-center gap-4 pt-4 px-2">
+        <button 
+          onClick={() => navigate(`/workouts/${splitId}`)}
+          className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors shrink-0"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div>
+          <h2 className="text-xl font-black text-white tracking-widest uppercase italic leading-none">Log Set</h2>
+          <p className="text-on-surface-variant text-[10px] mt-1 uppercase tracking-widest">Record your performance</p>
+        </div>
+      </div>
+
       {/* Exercise Hero */}
       <section className="relative h-48 w-full rounded-2xl overflow-hidden border border-white/10 bg-surface-container-low flex flex-col justify-end p-6">
         <div className="relative z-10 space-y-2">
@@ -92,7 +127,10 @@ export default function WorkoutLogger() {
               transition={{ delay: i * 0.1 }}
               className="grid grid-cols-12 gap-4 items-center glass-panel p-3 rounded-xl group transition-all hover:bg-white/5"
             >
-              <div className="col-span-2 font-lexend text-2xl font-medium text-primary ml-2">{i + 1}</div>
+              <div className="col-span-2 flex flex-col ml-2">
+                <span className="font-lexend text-2xl font-medium text-primary leading-none">{i + 1}</span>
+                {set.time && <span className="font-lexend text-[8px] text-on-surface-variant tracking-widest mt-1">{set.time}</span>}
+              </div>
               <div className="col-span-4">
                 <input 
                   type="number" 

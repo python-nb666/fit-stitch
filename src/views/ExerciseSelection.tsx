@@ -8,20 +8,26 @@ import { getSplits } from '@/src/lib/defaultData';
 export default function ExerciseSelection() {
   const { splitId } = useParams();
   const [split, setSplit] = useState<any>(null);
-  const [completedExs, setCompletedExs] = useState<string[]>([]);
+  const [completedExs, setCompletedExs] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     const splits = getSplits();
     const found = splits.find((s: any) => s.id === splitId) || splits[0];
     setSplit(found);
     
-    setCompletedExs(JSON.parse(localStorage.getItem('completedExs') || '[]'));
+    try {
+      const prev = JSON.parse(localStorage.getItem('completedExs') || '{}');
+      if (Array.isArray(prev)) setCompletedExs({});
+      else setCompletedExs(prev);
+    } catch {
+      setCompletedExs({});
+    }
   }, [splitId]);
 
   if (!split) return null;
 
   const totalExercises = split.exercises.length;
-  const completedCount = split.exercises.filter((ex: string) => completedExs.includes(ex)).length;
+  const completedCount = split.exercises.filter((ex: string) => !!completedExs[ex]).length;
   const progressPercent = totalExercises > 0 ? (completedCount / totalExercises) * 100 : 0;
 
   return (
@@ -50,7 +56,8 @@ export default function ExerciseSelection() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {split.exercises.map((ex: string, idx: number) => {
-            const isCompleted = completedExs.includes(ex);
+            const savedSets = completedExs[ex];
+            const isCompleted = !!savedSets;
             return (
               <Link 
                 key={idx} 
@@ -61,9 +68,9 @@ export default function ExerciseSelection() {
                   isCompleted ? "bg-surface-container-highest border-primary/20" : "bg-surface-container-low hover:bg-surface-container-high"
                 )}
               >
-                <div className={cn("absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10", isCompleted && "opacity-80")} />
+                <div className={cn("absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent z-10", isCompleted && "opacity-95")} />
                 
-                <div className="p-6 relative z-20 h-32 flex flex-col justify-end">
+                <div className="p-6 relative z-20 min-h-[8rem] flex flex-col justify-end">
                   <div className="flex justify-between items-start mb-auto">
                     <span className={cn(
                       "backdrop-blur-md px-2 py-0.5 rounded font-lexend text-[7px] border tracking-widest uppercase",
@@ -79,9 +86,9 @@ export default function ExerciseSelection() {
                   </h3>
                   <div className="flex justify-between items-end mt-2">
                     <div>
-                      <span className="block font-lexend text-[8px] text-on-surface-variant mb-1 uppercase tracking-widest">Last Weight</span>
-                      <span className={cn("text-lg font-lexend font-medium", isCompleted ? "text-on-surface-variant" : "text-primary-dim")}>
-                        -<span className="text-xs ml-1 text-on-surface-variant">KG</span>
+                      <span className="block font-lexend text-[8px] text-on-surface-variant mb-1 uppercase tracking-widest">Sets Completed</span>
+                      <span className={cn("text-lg font-lexend font-medium", isCompleted ? "text-primary" : "text-primary-dim")}>
+                        {isCompleted ? savedSets.length : '-'}<span className="text-xs ml-1 text-on-surface-variant">SETS</span>
                       </span>
                     </div>
                     {!isCompleted && (
@@ -90,6 +97,17 @@ export default function ExerciseSelection() {
                       </motion.div>
                     )}
                   </div>
+                  {isCompleted && (
+                    <div className="mt-4 space-y-1 bg-black/40 p-3 rounded-xl border border-white/5 backdrop-blur-sm">
+                      {savedSets.map((s: any) => (
+                        <div key={s.id} className="flex justify-between items-center text-[9px] font-lexend">
+                          <span className="text-on-surface-variant font-medium">S{s.id}</span>
+                          <span className="text-white tracking-widest">{s.weight}<span className="text-[7px] text-on-surface-variant mx-0.5">KG</span> × {s.reps}</span>
+                          <span className="text-primary-dim tracking-widest opacity-80">{s.time}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </Link>
             );
